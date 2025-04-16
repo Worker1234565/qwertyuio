@@ -41,10 +41,18 @@ HTML_TEMPLATE = """
 </html>
 """
 
+def get_client_ip():
+    # Проверяем заголовок X-Forwarded-For, если он есть
+    if 'X-Forwarded-For' in request.headers:
+        # Берем первый IP из цепочки (реальный IP клиента)
+        return request.headers['X-Forwarded-For'].split(',')[0].strip()
+    # Если заголовка нет, используем remote_addr
+    return request.remote_addr
+
 @app.route('/')
 def track_ip():
     # Получаем IP-адрес посетителя
-    visitor_ip = request.remote_addr
+    visitor_ip = get_client_ip()
     # Получаем текущее время в UTC
     visit_time = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     
